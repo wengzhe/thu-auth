@@ -162,8 +162,36 @@ def go_online(url):
     return res.text
 
 
+def go_offline(url):
+    username, _ = load_config()
+    token, callback = get_token(url, username)
+    token = token[0]
+    enc = 'srun_bx1'
+    data = {
+        "action": "logout",
+        "username": username,
+        "ac_id": "1",
+        "double_stack":"1",
+        "ip": "",
+        "n": "200",
+        "type": "1",
+        "callback": callback,
+        "_": current_milli_time(),
+    }
+    js_str = json.dumps({"username": data['username'], "ip": data['ip'], "acid": data['ac_id'], "enc_ver": enc}).replace('": "', '":"').replace(', "', ',"')
+    data['info'] = ("{SRBX1}" + base64(xEncode(js_str, token)))
+    data['chksum'] = hashlib.sha1((token + data['username'] + token + data['ac_id'] + token + data['ip']
+                                + token + data['n'] + token + data['type'] + token + data['info']).encode()).hexdigest()
+    login_url_final = url+'/cgi-bin/srun_portal?callback=%s&action=logout&username=%s&ac_id=1&ip=&double_stack=1&info=%s&chksum=%s&n=200&type=1&_=%d'\
+                      % (urllib.parse.quote(data['callback']), data['username'], urllib.parse.quote(data['info']).replace('/', '%2F'), data['chksum'], data['_'])
+    res = requests.get(login_url_final)
+
+    return res.text
+
+
 def main():
     print(go_online(login_url['IPv4']))
+    print(go_offline(login_url['IPv4']))
 
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ import json
 import math
 import urllib.parse
 import hmac
+import sys
 
 login_url = {
             'IPv4': "https://auth4.tsinghua.edu.cn",
@@ -189,9 +190,26 @@ def go_offline(url):
     return res.text
 
 
+def check_result(result):
+    if '"error":"ok"' in result:
+        print('success!')
+    else:
+        print('something seems went wrong, please check the return string:')
+        print(result)
+
+
 def main():
-    print(go_online(login_url['IPv4']))
-    print(go_offline(login_url['IPv4']))
+    par='login'
+    if len(sys.argv) > 1:
+        par = sys.argv[-1]
+    else:
+        print('default action=login')
+    if 'in' in par:
+        print('logging in')
+        check_result(go_online(login_url['IPv4']))
+    else:
+        print('logging out')
+        check_result(go_offline(login_url['IPv4']))
 
 
 if __name__ == "__main__":

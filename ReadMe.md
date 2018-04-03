@@ -10,6 +10,7 @@
 - 版本`Python 3`
 - 依赖`sudo -H pip3 install -r requirements.txt`
 - 请在当前目录下运行，或者修改`load_config()`的`path`参数。
+- './auth.py'
 
 ## 版本
 - 长期维护中(~2020)

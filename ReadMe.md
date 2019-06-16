@@ -1,6 +1,6 @@
 # THU-Auth
-由于2018.4.2发现有线网需要使用全新的`auth4.tsinghua.edu.cn`进行认证，故新写了认证脚本。
-2019.6.16发现IPv6也开始过滤MAC了，因此增加了`auth6_cmd.py`专用于`auth6.tsinghua.edu.cn`，如果IPv4和IPv6使用同一个MAC地址，则只需运行其中一个即可。
+- 由于2018.4.2发现有线网需要使用全新的`auth4.tsinghua.edu.cn`进行认证，故新写了认证脚本。
+- 2019.6.16发现IPv6也开始过滤MAC了，因此增加了`auth6_cmd.py`专用于`auth6.tsinghua.edu.cn`，如果IPv4和IPv6使用同一个MAC地址，则只需运行其中一个即可。
 
 ## 配置
 - `cp config/account.example.yaml config/account.yaml`

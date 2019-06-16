@@ -6,7 +6,7 @@ import auth_lib
 
 login_url = {
             'IPv4': "https://auth4.tsinghua.edu.cn",
-            # 'IPv6': "https://auth6.tsinghua.edu.cn"
+            'IPv6': "https://auth6.tsinghua.edu.cn"
             }
 
 

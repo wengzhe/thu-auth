@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 # -*- coding:utf-8 -*-
 __author__ = 'WZ'
 
@@ -9,8 +9,11 @@ import re
 import time
 import json
 import math
-import urllib.parse
+import urllib
+#import urllib.parse
+from urlparse import urlparse
 import hmac
+import struct
 
 
 def check_sign_int32(i):
@@ -51,7 +54,8 @@ def xEncode(str, key):
                 return None
             c = m
         for i in range(d):
-            a[i] = check_unsigned_int32(a[i]).to_bytes(4, byteorder='little')
+            #a[i] = check_unsigned_int32(a[i]).to_bytes(4, byteorder='little')
+            a[i] = struct.pack('<I', check_unsigned_int32(a[i]))
         if b:
             return b''.join(a)[0:c]
         else:
@@ -113,7 +117,7 @@ def base64(t):
     u = ""
     a = len(t)
     for o in range(0, a, 3):
-        h = int(t[o]) << 16 | (int(t[o + 1]) << 8 if o + 1 < a else 0) | (int(t[o + 2]) if o + 2 < a else 0)
+        h = ord(t[o]) << 16 | (ord(t[o + 1]) << 8 if o + 1 < a else 0) | (ord(t[o + 2]) if o + 2 < a else 0)
         for i in range(4):
             if o * 8 + i * 6 > a * 8:
                 u += r
@@ -148,13 +152,17 @@ def go_online(url, ip=''):
         "_": current_milli_time(),
     }
     js_str = json.dumps({"username": data['username'], "password": data['password'], "ip": data['ip'], "acid": data['ac_id'], "enc_ver": enc}).replace('": "', '":"').replace(', "', ',"')
+    print(js_str)
+    print(token)
     data['info'] = ("{SRBX1}" + base64(xEncode(js_str, token)))
-    hmd5 = hmac.new(token.encode(), b'', 'MD5').hexdigest()
+    #hmd5 = hmac.new(token.encode(), b'', 'MD5').hexdigest()
+    hmd5 = hmac.new(token.encode(), b'').hexdigest()
     data['password'] = ("{MD5}" + hmd5)
-    data['chksum'] = hashlib.sha1((token + data['username'] + token + hmd5 + token + data['ac_id'] + token + data['ip']
+    data['chksum'] = hashlib.sha1((token + str(data['username']) + token + hmd5 + token + data['ac_id'] + token + data['ip']
                                 + token + data['n'] + token + data['type'] + token + data['info']).encode()).hexdigest()
     login_url_final = url+'/cgi-bin/srun_portal?callback=%s&action=login&username=%s&password=%s&ac_id=1&ip=&double_stack=1&info=%s&chksum=%s&n=200&type=1&_=%d'\
-                      % (urllib.parse.quote(data['callback']), data['username'], urllib.parse.quote(data['password']), urllib.parse.quote(data['info']).replace('/', '%2F'), data['chksum'], data['_'])
+    % (urllib.quote_plus(data['callback']), data['username'], urllib.quote_plus(data['password']), urllib.quote_plus(data['info']).replace('/', '%2F'), data['chksum'], data['_'])
+    print(login_url_final)
     res = requests.get(login_url_final)
 
     return res.text
@@ -182,6 +190,7 @@ def go_offline(url):
                                 + token + data['n'] + token + data['type'] + token + data['info']).encode()).hexdigest()
     login_url_final = url+'/cgi-bin/srun_portal?callback=%s&action=logout&username=%s&ac_id=1&ip=&double_stack=1&info=%s&chksum=%s&n=200&type=1&_=%d'\
                       % (urllib.parse.quote(data['callback']), data['username'], urllib.parse.quote(data['info']).replace('/', '%2F'), data['chksum'], data['_'])
+    print(login_url_final)
     res = requests.get(login_url_final)
 
     return res.text
@@ -193,6 +202,5 @@ def check_result(result):
     else:
         print('something seems went wrong, please check the return string:')
         print(result)
-
 
 
